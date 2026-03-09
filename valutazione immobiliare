@@ -1,0 +1,55 @@
+import streamlit as st
+
+# Configurazione Pagina
+st.set_page_config(page_title="Valuta la tua Casa", page_icon="🏠")
+
+st.title("Quanto vale la tua casa? 🏠")
+st.markdown("Inserisci i dettagli per ricevere una valutazione gratuita istantanea.")
+
+# --- SEZIONE DATI IMMOBILE ---
+st.subheader("📍 Dati dell'Immobile")
+col1, col2 = st.columns(2)
+
+with col1:
+    indirizzo = st.text_input("Indirizzo e Comune")
+    mq = st.number_input("Superficie Totale (mq)", min_value=10, step=1)
+    
+with col2:
+    piano = st.selectbox("Piano", ["Terra", "Intermedio", "Ultimo", "Attico"])
+    stato = st.selectbox("Stato dell'immobile", ["Da ristrutturare", "Buono", "Ristrutturato/Nuovo"])
+
+# Espansione per Dati Catastali (Opzionali per non spaventare l'utente)
+with st.expander("Dati Catastali (Facoltativo)"):
+    foglio = st.text_input("Foglio")
+    particella = st.text_input("Particella")
+    subalterno = st.text_input("Subalterno")
+
+# --- SEZIONE CONTATTO ---
+st.subheader("📞 I tuoi Contatti")
+nome = st.text_input("Nome e Cognome")
+telefono = st.text_input("Numero di Telefono")
+email = st.text_input("Email")
+
+# --- LOGICA DI CALCOLO (Esempio semplificato) ---
+# In un caso reale, qui potresti integrare le medie OMI della tua zona
+prezzo_base_mq = 2500 
+
+# Coefficienti di merito
+coeff_stato = {"Da ristrutturare": 0.85, "Buono": 1.0, "Ristrutturato/Nuovo": 1.2}
+coeff_piano = {"Terra": 0.9, "Intermedio": 1.0, "Ultimo": 1.1, "Attico": 1.3}
+
+valore_stimato = mq * prezzo_base_mq * coeff_stato[stato] * coeff_piano[piano]
+
+# --- AZIONE FINALE ---
+if st.button("Ottieni Valutazione"):
+    if nome and telefono and email:
+        st.success(f"Grazie {nome}! Ecco la nostra stima preliminare:")
+        st.metric(label="Valore Stimato di Mercato", value=f"€ {valore_stimato:,.0f}")
+        
+        # Qui potresti aggiungere una funzione per inviarti una mail automatica con i dati
+        st.info("Un nostro consulente ti contatterà a breve per una perizia certificata.")
+        
+        # Log per il proprietario (te)
+        print(f"Nuovo Lead: {nome}, Tel: {telefono}, Immobile: {indirizzo}, Valore: {valore_stimato}")
+    else:
+        st.error("Per favore, inserisci i tuoi contatti per visualizzare il prezzo.")
